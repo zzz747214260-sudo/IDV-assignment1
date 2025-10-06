@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Singapore PSI Data Table</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    table, th, td {
+      border: 1px solid #444;
+      border-collapse: collapse;
+      padding: 8px;
+    }
+    th {
+      background-color: #f2f2f2;
+    }
+  </style>
+</head>
+<body>
+  <h2>Singapore PSI Table</h2>
+  <h4 id="timestring">Loading...</h4>
+
+  <table id="PSItable">
+    <tr>
+      <th>Metric</th>
+      <th>Central</th>
+      <th>West</th>
+      <th>East</th>
+      <th>North</th>
+      <th>South</th>
+    </tr>
+  </table>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+  <script>
+    // 从 data.gov.sg 获取实时 PSI 数据
+    fetch('https://api.data.gov.sg/v1/environment/psi')
+      .then(response => response.json())
+      .then(data => {
+        console.log(data); // 可在浏览器控制台查看数据结构
+
+        // 更新时间戳
+        const timestamp = data.items[0].update_timestamp;
+        document.getElementById("timestring").textContent = "Last updated: " + timestamp;
+
+        // 取出 readings 数据
+        const readings = data.items[0].readings;
+
+        // 遍历每个指标（12项，如 o3_sub_index, pm25_twenty_four_hourly, 等）
+        Object.keys(readings).forEach(metric => {
+          const row = d3.select("#PSItable").append("tr");
+          row.append("td").text(metric);
+
+          // 显示五个区域的数据
+          ["central", "west", "east", "north", "south"].forEach(region => {
+            row.append("td").text(readings[metric][region]);
+          });
+        });
+      })
+      .catch(error => {
+        console.error("Error fetching PSI data:", error);
+        document.getElementById("timestring").textContent = "Failed to load data.";
+      });
+  </script>
+</body>
+</html>
