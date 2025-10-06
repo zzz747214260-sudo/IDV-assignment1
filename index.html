@@ -16,6 +16,21 @@
     th {
       background-color: #f2f2f2;
     }
+    .data-source {
+      margin-top: 30px;
+      padding: 15px;
+      background-color: #f8f9fa;
+      border-left: 4px solid #4285f4;
+      font-size: 14px;
+    }
+    .data-source a {
+      color: #4285f4;
+      text-decoration: none;
+      font-weight: bold;
+    }
+    .data-source a:hover {
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
@@ -32,6 +47,19 @@
       <th>South</th>
     </tr>
   </table>
+
+  <!-- 数据来源链接 -->
+  <div class="data-source">
+    <strong>Data Source:</strong> 
+    Real-time PSI data from 
+    <a href="https://data.gov.sg/dataset/psi" target="_blank" rel="noopener noreferrer">
+      data.gov.sg - PSI API
+    </a>
+    • 
+    <a href="https://api.data.gov.sg/v1/environment/psi" target="_blank" rel="noopener noreferrer">
+      View Raw API Data
+    </a>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
