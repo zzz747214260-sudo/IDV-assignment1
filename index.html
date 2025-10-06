@@ -1,96 +1,779 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Singapore PSI Data Table</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Singapore PSI Data Dashboard</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #667eea;
+      --primary-dark: #5a6fd8;
+      --secondary: #764ba2;
+      --accent: #f093fb;
+      --text: #333;
+      --text-light: #666;
+      --bg: #f8f9fa;
+      --card: white;
+      --good: #5bc0de;
+      --moderate: #a3b1ff;
+      --unhealthy: #9d7bd1;
+      --very-unhealthy: #764ba2;
+      --hazardous: #5a3d7a;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      margin: 40px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: var(--text);
+      transition: all 0.3s ease;
     }
-    table, th, td {
-      border: 1px solid #444;
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      color: white;
+      position: relative;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    .theme-toggle {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .theme-toggle:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      margin-bottom: 25px;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
+
+    .time-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .time-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1rem;
+      color: var(--text-light);
+      padding: 10px 15px;
+      background: var(--bg);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .time-item i {
+      color: var(--primary);
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .search-box {
+      padding: 10px 15px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 1rem;
+      width: 250px;
+      transition: all 0.3s ease;
+      background: var(--card);
+    }
+
+    .search-box:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+    }
+
+    .refresh-btn {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .refresh-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    .refresh-btn:active {
+      transform: translateY(0);
+    }
+
+    .refresh-btn.loading i {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .table-container {
+      overflow-x: auto;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+
+    table {
+      width: 100%;
       border-collapse: collapse;
-      padding: 8px;
+      background: var(--card);
     }
+
     th {
-      background-color: #f2f2f2;
-    }
-    .data-source {
-      margin-top: 30px;
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+      color: white;
       padding: 15px;
-      background-color: #f8f9fa;
-      border-left: 4px solid #4285f4;
-      font-size: 14px;
+      text-align: left;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
     }
+
+    td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.2s ease;
+    }
+
+    /* 单元格悬停效果 */
+    td:hover {
+      background-color: #e3e8ff !important;
+      color: #333;
+      box-shadow: 0 0 0 2px var(--primary);
+      position: relative;
+      z-index: 1;
+    }
+
+    .metric-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .psi-value {
+      text-align: center;
+      font-weight: 500;
+      padding: 6px 10px;
+      margin: 0 2px;
+      border-radius: 0;
+      transition: all 0.3s ease;
+    }
+
+    .psi-value:hover {
+      transform: scale(1.05);
+    }
+
+    .loading-container {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 2s linear infinite;
+      margin: 0 auto 20px;
+    }
+
+    .data-source {
+      text-align: center;
+      padding: 20px;
+      color: white;
+      margin-top: 20px;
+    }
+
     .data-source a {
-      color: #4285f4;
+      color: #fff;
       text-decoration: none;
-      font-weight: bold;
+      font-weight: 600;
+      transition: all 0.3s ease;
     }
+
     .data-source a:hover {
       text-decoration: underline;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    }
+
+    .filters {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border: 2px solid #e0e0e0;
+      background: var(--card);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .filter-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* 更新颜色方案 - 更和谐的蓝色/紫色调 */
+    .psi-good { background-color: var(--good); color: white; }
+    .psi-moderate { background-color: var(--moderate); color: white; }
+    .psi-unhealthy { background-color: var(--unhealthy); color: white; }
+    .psi-very-unhealthy { background-color: var(--very-unhealthy); color: white; }
+    .psi-hazardous { background-color: var(--hazardous); color: white; }
+
+    /* 新增功能样式 */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--card);
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+    }
+
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: var(--primary);
+      margin: 5px 0;
+    }
+
+    .stat-label {
+      font-size: 0.9rem;
+      color: var(--text-light);
+    }
+
+    .region-selector {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      flex-wrap: wrap;
+    }
+
+    .region-btn {
+      padding: 8px 15px;
+      border: 2px solid #e0e0e0;
+      background: var(--card);
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .region-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    .highlight-updated {
+      animation: highlight 1.5s ease;
+    }
+
+    @keyframes highlight {
+      0% { background-color: rgba(255, 255, 0, 0.3); }
+      100% { background-color: transparent; }
+    }
+
+    .psi-explanation {
+      margin-top: 20px;
+      padding: 15px;
+      background: var(--bg);
+      border-radius: 10px;
+      font-size: 0.9rem;
+    }
+
+    .psi-levels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .psi-level {
+      text-align: center;
+      flex: 1;
+      padding: 5px;
+    }
+
+    .psi-color {
+      width: 100%;
+      height: 10px;
+      margin-bottom: 5px;
+    }
+
+    .dark-mode {
+      --text: #f0f0f0;
+      --text-light: #b0b0b0;
+      --bg: #2d3748;
+      --card: #4a5568;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 10px;
+      }
+      
+      .card {
+        padding: 20px;
+      }
+      
+      .time-info {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      
+      .search-box {
+        width: 100%;
+      }
+      
+      th, td {
+        padding: 10px;
+        font-size: 0.9rem;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Singapore PSI Table</h2>
-  <h4 id="timestring">Loading...</h4>
+  <div class="container">
+    <div class="header">
+      <h1>🌤️ Singapore PSI Dashboard</h1>
+      <p>Real-time Air Quality Monitoring</p>
+      <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i> Dark Mode
+      </button>
+    </div>
 
-  <table id="PSItable">
-    <tr>
-      <th>Metric</th>
-      <th>Central</th>
-      <th>West</th>
-      <th>East</th>
-      <th>North</th>
-      <th>South</th>
-    </tr>
-  </table>
+    <div class="card">
+      <div class="time-info">
+        <div class="time-item">
+          <i class="fas fa-database"></i>
+          <span id="dataUpdateTime">Data updated: Loading...</span>
+        </div>
+        <div class="time-item">
+          <i class="fas fa-clock"></i>
+          <span id="lastRefreshTime">Last refreshed: Never</span>
+        </div>
+      </div>
 
-  <!-- 数据来源链接 -->
-  <div class="data-source">
-    <strong>Data Source:</strong> 
-    Real-time PSI data from 
-    <a href="https://data.gov.sg/dataset/psi" target="_blank" rel="noopener noreferrer">
-      data.gov.sg - PSI API
-    </a>
-    • 
-    <a href="https://api.data.gov.sg/v1/environment/psi" target="_blank" rel="noopener noreferrer">
-      View Raw API Data
-    </a>
+      <div class="stats-grid" id="statsGrid">
+        <!-- 统计数据将动态填充 -->
+      </div>
+
+      <div class="controls">
+        <div class="filters">
+          <button class="filter-btn active" data-filter="all">All Metrics</button>
+          <button class="filter-btn" data-filter="pm">PM2.5/PM10</button>
+          <button class="filter-btn" data-filter="o3">Ozone</button>
+          <button class="filter-btn" data-filter="so2">SO₂</button>
+        </div>
+        
+        <input type="text" class="search-box" placeholder="Search metrics..." id="searchInput">
+        
+        <button class="refresh-btn" id="refreshBtn">
+          <i class="fas fa-sync-alt"></i>
+          Refresh Data
+        </button>
+      </div>
+
+      <div class="region-selector" id="regionSelector">
+        <!-- 区域选择器将动态填充 -->
+      </div>
+
+      <div class="table-container">
+        <table id="PSItable">
+          <thead>
+            <tr>
+              <th>Metric</th>
+              <th>Central</th>
+              <th>West</th>
+              <th>East</th>
+              <th>North</th>
+              <th>South</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Data will be populated here -->
+          </tbody>
+        </table>
+      </div>
+
+      <div class="psi-explanation">
+        <h3>PSI Levels Guide</h3>
+        <div class="psi-levels">
+          <div class="psi-level">
+            <div class="psi-color" style="background-color: var(--good);"></div>
+            <div>Good (0-50)</div>
+          </div>
+          <div class="psi-level">
+            <div class="psi-color" style="background-color: var(--moderate);"></div>
+            <div>Moderate (51-100)</div>
+          </div>
+          <div class="psi-level">
+            <div class="psi-color" style="background-color: var(--unhealthy);"></div>
+            <div>Unhealthy (101-200)</div>
+          </div>
+          <div class="psi-level">
+            <div class="psi-color" style="background-color: var(--very-unhealthy);"></div>
+            <div>Very Unhealthy (201-300)</div>
+          </div>
+          <div class="psi-level">
+            <div class="psi-color" style="background-color: var(--hazardous);"></div>
+            <div>Hazardous (>300)</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="loading-container" id="loadingIndicator">
+        <div class="spinner"></div>
+        <p>Loading PSI data...</p>
+      </div>
+    </div>
+
+    <div class="data-source">
+      <p>
+        Data Source: 
+        <a href="https://data.gov.sg/dataset/psi" target="_blank" rel="noopener noreferrer">
+          data.gov.sg - PSI API
+        </a>
+        • 
+        <a href="https://api.data.gov.sg/v1/environment/psi" target="_blank" rel="noopener noreferrer">
+          View Raw API Data
+        </a>
+      </p>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
-    // 从 data.gov.sg 获取实时 PSI 数据
-    fetch('https://api.data.gov.sg/v1/environment/psi')
-      .then(response => response.json())
-      .then(data => {
-        console.log(data); // 可在浏览器控制台查看数据结构
+    let currentData = null;
+    let selectedRegions = ["central", "west", "east", "north", "south"];
 
-        // 更新时间戳
-        const timestamp = data.items[0].update_timestamp;
-        document.getElementById("timestring").textContent = "Last updated: " + timestamp;
+    // 获取DOM元素
+    const tableBody = document.getElementById('tableBody');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const searchInput = document.getElementById('searchInput');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const dataUpdateTimeElement = document.getElementById('dataUpdateTime');
+    const lastRefreshTimeElement = document.getElementById('lastRefreshTime');
+    const statsGrid = document.getElementById('statsGrid');
+    const regionSelector = document.getElementById('regionSelector');
+    const themeToggle = document.getElementById('themeToggle');
 
-        // 取出 readings 数据
-        const readings = data.items[0].readings;
-
-        // 遍历每个指标（12项，如 o3_sub_index, pm25_twenty_four_hourly, 等）
-        Object.keys(readings).forEach(metric => {
-          const row = d3.select("#PSItable").append("tr");
-          row.append("td").text(metric);
-
-          // 显示五个区域的数据
-          ["central", "west", "east", "north", "south"].forEach(region => {
-            row.append("td").text(readings[metric][region]);
-          });
-        });
-      })
-      .catch(error => {
-        console.error("Error fetching PSI data:", error);
-        document.getElementById("timestring").textContent = "Failed to load data.";
+    // 初始化区域选择器
+    function initRegionSelector() {
+      const regions = [
+        { id: "central", name: "Central" },
+        { id: "west", name: "West" },
+        { id: "east", name: "East" },
+        { id: "north", name: "North" },
+        { id: "south", name: "South" }
+      ];
+      
+      regions.forEach(region => {
+        const button = document.createElement('button');
+        button.className = 'region-btn active';
+        button.dataset.region = region.id;
+        button.textContent = region.name;
+        button.addEventListener('click', toggleRegion);
+        regionSelector.appendChild(button);
       });
+    }
+
+    // 切换区域选择
+    function toggleRegion(e) {
+      const region = e.target.dataset.region;
+      e.target.classList.toggle('active');
+      
+      if (e.target.classList.contains('active')) {
+        if (!selectedRegions.includes(region)) {
+          selectedRegions.push(region);
+        }
+      } else {
+        selectedRegions = selectedRegions.filter(r => r !== region);
+      }
+      
+      if (currentData) {
+        renderTable(currentData, searchInput.value, document.querySelector('.filter-btn.active').dataset.filter);
+      }
+    }
+
+    // 显示加载状态
+    function showLoading() {
+      loadingIndicator.style.display = 'block';
+      tableBody.innerHTML = '';
+    }
+
+    // 隐藏加载状态
+    function hideLoading() {
+      loadingIndicator.style.display = 'none';
+    }
+
+    // 根据PSI值获取颜色类别
+    function getPSIColor(value) {
+      if (value <= 50) return 'psi-good';
+      if (value <= 100) return 'psi-moderate';
+      if (value <= 200) return 'psi-unhealthy';
+      if (value <= 300) return 'psi-very-unhealthy';
+      return 'psi-hazardous';
+    }
+
+    // 获取区域的平均PSI
+    function getRegionAveragePSI(readings, region) {
+      const values = Object.keys(readings)
+        .filter(metric => metric.includes('psi'))
+        .map(metric => readings[metric][region])
+        .filter(value => value !== null && !isNaN(value));
+      
+      return values.length > 0 ? 
+        Math.round(values.reduce((a, b) => a + b, 0) / values.length) : 
+        null;
+    }
+
+    // 渲染统计数据
+    function renderStats(data) {
+      statsGrid.innerHTML = '';
+      const readings = data.items[0].readings;
+      
+      selectedRegions.forEach(region => {
+        const avgPSI = getRegionAveragePSI(readings, region);
+        if (avgPSI !== null) {
+          const statCard = document.createElement('div');
+          statCard.className = 'stat-card';
+          
+          const psiLevel = getPSIColor(avgPSI).replace('psi-', '');
+          const levelNames = {
+            'good': 'Good',
+            'moderate': 'Moderate',
+            'unhealthy': 'Unhealthy',
+            'very-unhealthy': 'Very Unhealthy',
+            'hazardous': 'Hazardous'
+          };
+          
+          statCard.innerHTML = `
+            <div class="stat-label">${region.charAt(0).toUpperCase() + region.slice(1)}</div>
+            <div class="stat-value">${avgPSI}</div>
+            <div class="psi-level">${levelNames[psiLevel]}</div>
+          `;
+          
+          statsGrid.appendChild(statCard);
+        }
+      });
+    }
+
+    // 渲染表格数据
+    function renderTable(data, searchTerm = '', filter = 'all') {
+      tableBody.innerHTML = '';
+      const readings = data.items[0].readings;
+
+      Object.keys(readings).forEach(metric => {
+        // 搜索过滤
+        if (searchTerm && !metric.toLowerCase().includes(searchTerm.toLowerCase())) {
+          return;
+        }
+
+        // 分类过滤
+        if (filter !== 'all') {
+          if (filter === 'pm' && !metric.includes('pm')) return;
+          if (filter === 'o3' && !metric.includes('o3')) return;
+          if (filter === 'so2' && !metric.includes('so2')) return;
+        }
+
+        const row = document.createElement('tr');
+        
+        // 指标名称单元格
+        const metricCell = document.createElement('td');
+        metricCell.className = 'metric-name';
+        metricCell.textContent = metric;
+        row.appendChild(metricCell);
+
+        // 区域数据单元格
+        selectedRegions.forEach(region => {
+          const cell = document.createElement('td');
+          const value = readings[metric][region];
+          cell.textContent = value;
+          
+          // 为数值添加颜色背景
+          if (!isNaN(value) && value !== null) {
+            cell.className = `psi-value ${getPSIColor(value)}`;
+          }
+          
+          row.appendChild(cell);
+        });
+
+        tableBody.appendChild(row);
+      });
+    }
+
+    // 从 data.gov.sg 获取实时 PSI 数据
+    function fetchPSIData() {
+      showLoading();
+      refreshBtn.classList.add('loading');
+
+      // 添加随机参数防止缓存
+      const timestamp = new Date().getTime();
+      fetch(`https://api.data.gov.sg/v1/environment/psi?_=${timestamp}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log("Fresh data fetched:", data);
+          currentData = data;
+
+          // 获取当前时间作为刷新时间
+          const refreshTime = new Date();
+          lastRefreshTimeElement.textContent = `Last refreshed: ${refreshTime.toLocaleString()}`;
+
+          // 显示API数据中的更新时间
+          const updateTime = new Date(data.items[0].update_timestamp);
+          dataUpdateTimeElement.textContent = `Data updated: ${updateTime.toLocaleString()}`;
+
+          // 渲染统计数据和表格
+          renderStats(data);
+          renderTable(data);
+          hideLoading();
+          refreshBtn.classList.remove('loading');
+          
+          // 添加更新动画
+          document.querySelectorAll('.psi-value').forEach(cell => {
+            cell.classList.add('highlight-updated');
+            setTimeout(() => {
+              cell.classList.remove('highlight-updated');
+            }, 1500);
+          });
+        })
+        .catch(error => {
+          console.error("Error fetching PSI data:", error);
+          dataUpdateTimeElement.textContent = "Failed to load data. Please try again.";
+          hideLoading();
+          refreshBtn.classList.remove('loading');
+        });
+    }
+
+    // 切换主题
+    function toggleTheme() {
+      document.body.classList.toggle('dark-mode');
+      if (document.body.classList.contains('dark-mode')) {
+        themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+      } else {
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+      }
+    }
+
+    // 事件监听器
+    refreshBtn.addEventListener('click', fetchPSIData);
+    themeToggle.addEventListener('click', toggleTheme);
+
+    searchInput.addEventListener('input', (e) => {
+      if (currentData) {
+        renderTable(currentData, e.target.value, document.querySelector('.filter-btn.active').dataset.filter);
+      }
+    });
+
+    filterBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        if (currentData) {
+          renderTable(currentData, searchInput.value, btn.dataset.filter);
+        }
+      });
+    });
+
+    // 初始加载
+    initRegionSelector();
+    fetchPSIData();
+
+    // 自动刷新（每2分钟）
+    setInterval(fetchPSIData, 2 * 60 * 1000);
   </script>
 </body>
 </html>
