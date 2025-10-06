@@ -26,15 +26,18 @@
       --unhealthy: #9d7bd1;
       --very-unhealthy: #764ba2;
       --hazardous: #5a3d7a;
+      --border-radius: 12px;
+      --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
       min-height: 100vh;
       padding: 20px;
       color: var(--text);
       transition: all 0.3s ease;
+      line-height: 1.5;
     }
 
     .container {
@@ -53,11 +56,14 @@
       font-size: 2.5rem;
       margin-bottom: 10px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      font-weight: 700;
+      letter-spacing: -0.5px;
     }
 
     .header p {
       font-size: 1.1rem;
       opacity: 0.9;
+      font-weight: 300;
     }
 
     .theme-toggle {
@@ -71,6 +77,7 @@
       border-radius: 20px;
       cursor: pointer;
       transition: all 0.3s ease;
+      font-size: 0.9rem;
     }
 
     .theme-toggle:hover {
@@ -79,9 +86,9 @@
 
     .card {
       background: var(--card);
-      border-radius: 15px;
+      border-radius: var(--border-radius);
       padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      box-shadow: var(--card-shadow);
       margin-bottom: 25px;
       backdrop-filter: blur(10px);
       transition: all 0.3s ease;
@@ -106,6 +113,7 @@
       background: var(--bg);
       border-radius: 8px;
       transition: all 0.3s ease;
+      font-weight: 400;
     }
 
     .time-item i {
@@ -123,18 +131,19 @@
 
     .search-box {
       padding: 10px 15px;
-      border: 2px solid #e0e0e0;
-      border-radius: 25px;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
       font-size: 1rem;
       width: 250px;
       transition: all 0.3s ease;
       background: var(--card);
+      font-family: inherit;
     }
 
     .search-box:focus {
       outline: none;
       border-color: var(--primary);
-      box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
     }
 
     .refresh-btn {
@@ -142,13 +151,14 @@
       color: white;
       border: none;
       padding: 10px 20px;
-      border-radius: 25px;
+      border-radius: 10px;
       cursor: pointer;
       font-size: 1rem;
       transition: all 0.3s ease;
       display: flex;
       align-items: center;
       gap: 8px;
+      font-weight: 500;
     }
 
     .refresh-btn:hover {
@@ -171,37 +181,50 @@
 
     .table-container {
       overflow-x: auto;
-      border-radius: 10px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      border-radius: var(--border-radius);
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     }
 
     table {
       width: 100%;
-      border-collapse: collapse;
+      border-collapse: separate;
+      border-spacing: 0;
       background: var(--card);
+      border-radius: var(--border-radius);
+      overflow: hidden;
     }
 
     th {
       background: linear-gradient(135deg, var(--primary), var(--secondary));
       color: white;
-      padding: 15px;
-      text-align: left;
+      padding: 16px;
+      text-align: center; /* 表头居中 */
       font-weight: 600;
       position: sticky;
       top: 0;
+      font-size: 0.95rem;
+    }
+
+    /* 第一列（指标名称）保持左对齐 */
+    th:first-child {
+      text-align: left;
     }
 
     td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #f0f0f0;
+      padding: 16px;
+      border-bottom: 1px solid rgba(0,0,0,0.05);
       transition: all 0.2s ease;
+      text-align: center; /* 所有数据单元格居中 */
+    }
+
+    /* 第一列（指标名称）保持左对齐 */
+    td:first-child {
+      text-align: left;
     }
 
     /* 单元格悬停效果 */
     td:hover {
-      background-color: #e3e8ff !important;
-      color: #333;
-      box-shadow: 0 0 0 2px var(--primary);
+      background-color: rgba(227, 232, 255, 0.5) !important;
       position: relative;
       z-index: 1;
     }
@@ -209,19 +232,27 @@
     .metric-name {
       font-weight: 600;
       color: var(--text);
+      font-size: 0.95rem;
     }
 
+    /* 仿苹果风格的数值显示样式 */
     .psi-value {
       text-align: center;
-      font-weight: 500;
-      padding: 6px 10px;
-      margin: 0 2px;
-      border-radius: 0;
+      font-weight: 600;
+      padding: 8px 12px;
+      margin: 0 auto; /* 确保居中 */
+      border-radius: 8px;
       transition: all 0.3s ease;
+      display: inline-block;
+      min-width: 50px;
+      font-size: 0.9rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      border: 1px solid rgba(0,0,0,0.03);
     }
 
     .psi-value:hover {
       transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
     .loading-container {
@@ -249,7 +280,7 @@
     .data-source a {
       color: #fff;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: 500;
       transition: all 0.3s ease;
     }
 
@@ -266,11 +297,13 @@
 
     .filter-btn {
       padding: 8px 16px;
-      border: 2px solid #e0e0e0;
+      border: 1px solid #e0e0e0;
       background: var(--card);
-      border-radius: 20px;
+      border-radius: 8px;
       cursor: pointer;
       transition: all 0.3s ease;
+      font-size: 0.9rem;
+      font-weight: 500;
     }
 
     .filter-btn.active {
@@ -280,11 +313,31 @@
     }
 
     /* 更新颜色方案 - 更和谐的蓝色/紫色调 */
-    .psi-good { background-color: var(--good); color: white; }
-    .psi-moderate { background-color: var(--moderate); color: white; }
-    .psi-unhealthy { background-color: var(--unhealthy); color: white; }
-    .psi-very-unhealthy { background-color: var(--very-unhealthy); color: white; }
-    .psi-hazardous { background-color: var(--hazardous); color: white; }
+    .psi-good { 
+      background: linear-gradient(135deg, #5bc0de, #4cadc9);
+      color: white; 
+      box-shadow: 0 2px 5px rgba(91, 192, 222, 0.3);
+    }
+    .psi-moderate { 
+      background: linear-gradient(135deg, #a3b1ff, #8f9ef5);
+      color: white; 
+      box-shadow: 0 2px 5px rgba(163, 177, 255, 0.3);
+    }
+    .psi-unhealthy { 
+      background: linear-gradient(135deg, #9d7bd1, #8b6ac0);
+      color: white; 
+      box-shadow: 0 2px 5px rgba(157, 123, 209, 0.3);
+    }
+    .psi-very-unhealthy { 
+      background: linear-gradient(135deg, #764ba2, #684392);
+      color: white; 
+      box-shadow: 0 2px 5px rgba(118, 75, 162, 0.3);
+    }
+    .psi-hazardous { 
+      background: linear-gradient(135deg, #5a3d7a, #4d3568);
+      color: white; 
+      box-shadow: 0 2px 5px rgba(90, 61, 122, 0.3);
+    }
 
     /* 新增功能样式 */
     .stats-grid {
@@ -296,50 +349,31 @@
 
     .stat-card {
       background: var(--card);
-      padding: 15px;
-      border-radius: 10px;
+      padding: 20px;
+      border-radius: var(--border-radius);
       text-align: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      box-shadow: var(--card-shadow);
       transition: all 0.3s ease;
+      border: 1px solid rgba(0,0,0,0.03);
     }
 
     .stat-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 8px 15px rgba(0,0,0,0.15);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
     }
 
     .stat-value {
       font-size: 1.8rem;
-      font-weight: bold;
+      font-weight: 700;
       color: var(--primary);
       margin: 5px 0;
+      letter-spacing: -0.5px;
     }
 
     .stat-label {
       font-size: 0.9rem;
       color: var(--text-light);
-    }
-
-    .region-selector {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
-      flex-wrap: wrap;
-    }
-
-    .region-btn {
-      padding: 8px 15px;
-      border: 2px solid #e0e0e0;
-      background: var(--card);
-      border-radius: 20px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .region-btn.active {
-      background: var(--primary);
-      color: white;
-      border-color: var(--primary);
+      font-weight: 500;
     }
 
     .highlight-updated {
@@ -353,10 +387,11 @@
 
     .psi-explanation {
       margin-top: 20px;
-      padding: 15px;
+      padding: 20px;
       background: var(--bg);
-      border-radius: 10px;
+      border-radius: var(--border-radius);
       font-size: 0.9rem;
+      border: 1px solid rgba(0,0,0,0.05);
     }
 
     .psi-levels {
@@ -369,12 +404,14 @@
       text-align: center;
       flex: 1;
       padding: 5px;
+      font-size: 0.8rem;
     }
 
     .psi-color {
       width: 100%;
       height: 10px;
       margin-bottom: 5px;
+      border-radius: 5px;
     }
 
     .dark-mode {
@@ -408,12 +445,17 @@
       }
       
       th, td {
-        padding: 10px;
+        padding: 12px;
         font-size: 0.9rem;
       }
       
       .stats-grid {
         grid-template-columns: 1fr;
+      }
+      
+      .psi-levels {
+        flex-direction: column;
+        gap: 10px;
       }
     }
   </style>
@@ -460,10 +502,6 @@
         </button>
       </div>
 
-      <div class="region-selector" id="regionSelector">
-        <!-- 区域选择器将动态填充 -->
-      </div>
-
       <div class="table-container">
         <table id="PSItable">
           <thead>
@@ -486,23 +524,23 @@
         <h3>PSI Levels Guide</h3>
         <div class="psi-levels">
           <div class="psi-level">
-            <div class="psi-color" style="background-color: var(--good);"></div>
+            <div class="psi-color" style="background: linear-gradient(135deg, #5bc0de, #4cadc9);"></div>
             <div>Good (0-50)</div>
           </div>
           <div class="psi-level">
-            <div class="psi-color" style="background-color: var(--moderate);"></div>
+            <div class="psi-color" style="background: linear-gradient(135deg, #a3b1ff, #8f9ef5);"></div>
             <div>Moderate (51-100)</div>
           </div>
           <div class="psi-level">
-            <div class="psi-color" style="background-color: var(--unhealthy);"></div>
+            <div class="psi-color" style="background: linear-gradient(135deg, #9d7bd1, #8b6ac0);"></div>
             <div>Unhealthy (101-200)</div>
           </div>
           <div class="psi-level">
-            <div class="psi-color" style="background-color: var(--very-unhealthy);"></div>
+            <div class="psi-color" style="background: linear-gradient(135deg, #764ba2, #684392);"></div>
             <div>Very Unhealthy (201-300)</div>
           </div>
           <div class="psi-level">
-            <div class="psi-color" style="background-color: var(--hazardous);"></div>
+            <div class="psi-color" style="background: linear-gradient(135deg, #5a3d7a, #4d3568);"></div>
             <div>Hazardous (>300)</div>
           </div>
         </div>
@@ -531,7 +569,6 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
   <script>
     let currentData = null;
-    let selectedRegions = ["central", "west", "east", "north", "south"];
 
     // 获取DOM元素
     const tableBody = document.getElementById('tableBody');
@@ -542,46 +579,7 @@
     const dataUpdateTimeElement = document.getElementById('dataUpdateTime');
     const lastRefreshTimeElement = document.getElementById('lastRefreshTime');
     const statsGrid = document.getElementById('statsGrid');
-    const regionSelector = document.getElementById('regionSelector');
     const themeToggle = document.getElementById('themeToggle');
-
-    // 初始化区域选择器
-    function initRegionSelector() {
-      const regions = [
-        { id: "central", name: "Central" },
-        { id: "west", name: "West" },
-        { id: "east", name: "East" },
-        { id: "north", name: "North" },
-        { id: "south", name: "South" }
-      ];
-      
-      regions.forEach(region => {
-        const button = document.createElement('button');
-        button.className = 'region-btn active';
-        button.dataset.region = region.id;
-        button.textContent = region.name;
-        button.addEventListener('click', toggleRegion);
-        regionSelector.appendChild(button);
-      });
-    }
-
-    // 切换区域选择
-    function toggleRegion(e) {
-      const region = e.target.dataset.region;
-      e.target.classList.toggle('active');
-      
-      if (e.target.classList.contains('active')) {
-        if (!selectedRegions.includes(region)) {
-          selectedRegions.push(region);
-        }
-      } else {
-        selectedRegions = selectedRegions.filter(r => r !== region);
-      }
-      
-      if (currentData) {
-        renderTable(currentData, searchInput.value, document.querySelector('.filter-btn.active').dataset.filter);
-      }
-    }
 
     // 显示加载状态
     function showLoading() {
@@ -619,8 +617,9 @@
     function renderStats(data) {
       statsGrid.innerHTML = '';
       const readings = data.items[0].readings;
+      const regions = ["central", "west", "east", "north", "south"];
       
-      selectedRegions.forEach(region => {
+      regions.forEach(region => {
         const avgPSI = getRegionAveragePSI(readings, region);
         if (avgPSI !== null) {
           const statCard = document.createElement('div');
@@ -673,14 +672,18 @@
         row.appendChild(metricCell);
 
         // 区域数据单元格
-        selectedRegions.forEach(region => {
+        ["central", "west", "east", "north", "south"].forEach(region => {
           const cell = document.createElement('td');
           const value = readings[metric][region];
-          cell.textContent = value;
           
-          // 为数值添加颜色背景
+          // 为数值添加高级样式
           if (!isNaN(value) && value !== null) {
-            cell.className = `psi-value ${getPSIColor(value)}`;
+            const valueSpan = document.createElement('span');
+            valueSpan.className = `psi-value ${getPSIColor(value)}`;
+            valueSpan.textContent = value;
+            cell.appendChild(valueSpan);
+          } else {
+            cell.textContent = value;
           }
           
           row.appendChild(cell);
@@ -769,7 +772,6 @@
     });
 
     // 初始加载
-    initRegionSelector();
     fetchPSIData();
 
     // 自动刷新（每2分钟）
